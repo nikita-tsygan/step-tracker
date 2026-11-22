@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#10120f">
+  <meta name="theme-color" content="#0b1017">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Шаги">
@@ -12,15 +12,15 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #10120f;
-      --surface: #191c18;
-      --surface-raised: #20241f;
-      --line: #2b302a;
-      --text: #f2f4ef;
-      --muted: #92988f;
-      --green: #c4f36b;
-      --green-dark: #27351b;
-      --red: #ff8f86;
+      --bg: #0b1017;
+      --surface: #141c25;
+      --surface-raised: #1d2833;
+      --line: #2b3947;
+      --text: #f3f7fb;
+      --muted: #9aa8b6;
+      --accent: #82caff;
+      --accent-dark: #18364c;
+      --negative: #a7b3c0;
       --radius: 22px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-synthesis: none;
@@ -36,7 +36,7 @@
       min-height: 100vh;
       min-height: 100dvh;
       background:
-        radial-gradient(ellipse at 50% -18%, rgba(196, 243, 107, .09), transparent 42%),
+        radial-gradient(ellipse at 50% -18%, rgba(105, 183, 245, .12), transparent 42%),
         var(--bg);
       color: var(--text);
     }
@@ -64,8 +64,8 @@
       height: 40px;
       place-items: center;
       border-radius: 14px;
-      background: var(--green);
-      color: #17200d;
+      background: var(--accent);
+      color: #10202d;
     }
     .brand-mark svg { width: 22px; height: 22px; }
     .brand-name { font-size: 15px; font-weight: 720; letter-spacing: -.02em; }
@@ -77,9 +77,9 @@
       position: relative;
       overflow: hidden;
       padding: 27px 25px 24px;
-      border: 1px solid #30362c;
+      border: 1px solid #2d4051;
       border-radius: 28px;
-      background: linear-gradient(135deg, #22281d, #191c18 65%);
+      background: linear-gradient(135deg, #1b2c3b, #141c25 68%);
     }
     .hero::after {
       position: absolute;
@@ -87,15 +87,15 @@
       right: -44px;
       width: 190px;
       height: 190px;
-      border: 1px solid rgba(196, 243, 107, .12);
+      border: 1px solid rgba(130, 202, 255, .16);
       border-radius: 50%;
-      box-shadow: 0 0 0 22px rgba(196, 243, 107, .025), 0 0 0 46px rgba(196, 243, 107, .02);
+      box-shadow: 0 0 0 22px rgba(130, 202, 255, .035), 0 0 0 46px rgba(130, 202, 255, .025);
       content: "";
       pointer-events: none;
     }
     .eyebrow {
       margin: 0 0 11px;
-      color: #b6c69d;
+      color: #a8d7f6;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: .13em;
@@ -108,7 +108,7 @@
       letter-spacing: -.055em;
       line-height: 1.12;
     }
-    .hero-title span { color: var(--green); }
+    .hero-title span { color: var(--accent); }
     .hero-subtitle { margin: 9px 0 0; color: var(--muted); font-size: 13px; }
 
     .section-heading {
@@ -149,8 +149,8 @@
     }
     .stat-value.compact { font-size: 20px; }
     .stat-detail { margin-top: 6px; color: var(--muted); font-size: 11px; }
-    .positive { color: var(--green); }
-    .negative { color: var(--red); }
+    .positive { color: var(--accent); }
+    .negative { color: var(--negative); }
 
     .entry-card {
       padding: 19px;
@@ -158,7 +158,8 @@
       border-radius: var(--radius);
       background: var(--surface);
     }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .form-grid > div { min-width: 0; }
     .field-label {
       display: block;
       margin: 0 0 7px 2px;
@@ -167,27 +168,34 @@
       font-weight: 600;
     }
     .field-input {
+      display: block;
       width: 100%;
-      min-height: 48px;
+      min-width: 0;
+      height: 48px;
       padding: 0 13px;
       border: 1px solid #343a32;
       border-radius: 13px;
+      box-sizing: border-box;
       outline: none;
       background: #121511;
       color: var(--text);
       font-size: 15px;
       transition: border-color .15s, box-shadow .15s;
     }
-    .field-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(196, 243, 107, .1); }
-    input[type="date"] { color-scheme: dark; }
+    .field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(130, 202, 255, .14); }
+    input[type="date"] {
+      color-scheme: dark;
+      -webkit-appearance: none;
+      appearance: none;
+    }
     .save-button {
       width: 100%;
       min-height: 49px;
       margin-top: 13px;
       border: 0;
       border-radius: 14px;
-      background: var(--green);
-      color: #17200d;
+      background: var(--accent);
+      color: #10202d;
       font-size: 14px;
       font-weight: 760;
       cursor: pointer;
@@ -225,7 +233,7 @@
       border-bottom: 1px solid #292d28;
     }
     .history-row:last-child { border-bottom: 0; }
-    .history-row.goal-row { background: linear-gradient(90deg, rgba(196, 243, 107, .085), transparent 85%); }
+    .history-row.goal-row { background: linear-gradient(90deg, rgba(130, 202, 255, .12), transparent 85%); }
     .history-date { font-size: 13px; font-weight: 610; }
     .history-weekday { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 450; }
     .history-steps { white-space: nowrap; font-size: 13px; font-weight: 680; }
@@ -234,8 +242,8 @@
       margin-left: 5px;
       padding: 3px 6px;
       border-radius: 7px;
-      background: var(--green-dark);
-      color: var(--green);
+      background: var(--accent-dark);
+      color: var(--accent);
       font-size: 9px;
       font-weight: 760;
       vertical-align: 1px;
@@ -294,9 +302,9 @@
       max-width: calc(100% - 36px);
       margin: auto;
       padding: 12px 16px;
-      border: 1px solid #414a37;
+      border: 1px solid #39536a;
       border-radius: 13px;
-      background: #252b20;
+      background: #1d2b37;
       color: var(--text);
       font-size: 12px;
       box-shadow: 0 12px 35px rgba(0, 0, 0, .35);
@@ -370,7 +378,7 @@
         <article class="stat-card">
           <div class="stat-label">Среднее за 7 дней</div>
           <strong class="stat-value" id="avg7">—</strong>
-          <div class="stat-detail">шагов в день</div>
+          <div class="stat-detail" id="avg7Detail">шагов в день</div>
         </article>
         <article class="stat-card">
           <div class="stat-label">Цель 10 000+</div>
@@ -531,17 +539,21 @@
         return records.find((record) => record.date === dateString);
       }
 
-      function rangeAverage(endOffset, length) {
+      function rangeStats(endOffset, length) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         let total = 0;
+        let count = 0;
         for (let offset = endOffset; offset < endOffset + length; offset += 1) {
           const date = new Date(today);
           date.setDate(today.getDate() - offset);
           const record = recordFor(localDateString(date));
-          if (record) total += record.steps;
+          if (record) {
+            total += record.steps;
+            count += 1;
+          }
         }
-        return total / length;
+        return { average: total / length, count };
       }
 
       function deltaText(current, previous) {
@@ -562,17 +574,23 @@
       }
 
       function updateComparison(valueId, detailId, current, previous) {
-        const result = deltaText(current, previous);
         const value = byId(valueId);
-        value.textContent = result.value;
         value.classList.remove("positive", "negative");
+        if (current.count < 2 || previous.count < 2) {
+          value.textContent = "—";
+          byId(detailId).textContent = "нужно минимум 2 дня с данными в каждом периоде";
+          return;
+        }
+        const result = deltaText(current.average, previous.average);
+        value.textContent = result.value;
         if (result.className) value.classList.add(result.className);
         byId(detailId).textContent = result.detail;
       }
 
       function renderSummary() {
-        const avg = rangeAverage(0, 7);
-        byId("avg7").textContent = formatNumber(Math.round(avg));
+        const avg = rangeStats(0, 7);
+        byId("avg7").textContent = avg.count >= 2 ? formatNumber(Math.round(avg.average)) : "—";
+        byId("avg7Detail").textContent = avg.count >= 2 ? "шагов в день" : "нужно минимум 2 дня с данными";
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -605,8 +623,8 @@
           byId("yesterdayDetail").textContent = "шагов к вчерашнему дню";
         }
 
-        updateComparison("weekDelta", "weekDetail", rangeAverage(0, 7), rangeAverage(7, 7));
-        updateComparison("monthDelta", "monthDetail", rangeAverage(0, 30), rangeAverage(30, 30));
+        updateComparison("weekDelta", "weekDetail", rangeStats(0, 7), rangeStats(7, 7));
+        updateComparison("monthDelta", "monthDetail", rangeStats(0, 30), rangeStats(30, 30));
       }
 
       function icon(name) {

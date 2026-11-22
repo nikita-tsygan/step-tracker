@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b1017">
+  <meta name="theme-color" id="themeColorMeta" content="#0b1017">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" id="appleStatusMeta" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Шаги">
   <meta name="description" content="Ежедневный трекер шагов с аналитикой и резервным копированием.">
   <title>Шаги — трекер активности</title>
@@ -19,13 +19,49 @@
       --text: #f3f7fb;
       --muted: #9aa8b6;
       --accent: #82caff;
-      --accent-dark: #18364c;
+      --accent-rgb: 130, 202, 255;
+      --accent-contrast: #10202d;
       --negative: #a7b3c0;
+      --hero-border: #2d4051;
+      --hero-start: #1b2c3b;
+      --hero-end: #141c25;
+      --eyebrow: #a8d7f6;
+      --input-bg: #0d141c;
+      --input-border: #2b3947;
+      --control-bg: #18232e;
+      --control-border: #2b3947;
+      --control-hover: #526e85;
+      --backup-bg: rgba(20, 28, 37, .82);
+      --toast-bg: #1d2b37;
+      --toast-border: #39536a;
       --radius: 22px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-synthesis: none;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
+    }
+
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --bg: #f3f6fa;
+      --surface: #ffffff;
+      --surface-raised: #edf2f7;
+      --line: #d9e2eb;
+      --text: #1b2836;
+      --muted: #657586;
+      --negative: #617181;
+      --hero-border: #d6e5f1;
+      --hero-start: #e4f1fb;
+      --hero-end: #f6f9fc;
+      --eyebrow: #496d8a;
+      --input-bg: #ffffff;
+      --input-border: #cad6e1;
+      --control-bg: #f5f8fb;
+      --control-border: #cbd7e2;
+      --control-hover: #9db6ca;
+      --backup-bg: rgba(255, 255, 255, .86);
+      --toast-bg: #ffffff;
+      --toast-border: #cad6e2;
     }
 
     * { box-sizing: border-box; }
@@ -36,9 +72,10 @@
       min-height: 100vh;
       min-height: 100dvh;
       background:
-        radial-gradient(ellipse at 50% -18%, rgba(105, 183, 245, .12), transparent 42%),
+        radial-gradient(ellipse at 50% -18%, rgba(var(--accent-rgb), .12), transparent 42%),
         var(--bg);
       color: var(--text);
+      transition: background-color .2s, color .2s;
     }
 
     button, input { font: inherit; }
@@ -65,7 +102,7 @@
       place-items: center;
       border-radius: 14px;
       background: var(--accent);
-      color: #10202d;
+      color: var(--accent-contrast);
     }
     .brand-mark svg { width: 22px; height: 22px; }
     .brand-name { font-size: 15px; font-weight: 720; letter-spacing: -.02em; }
@@ -77,9 +114,9 @@
       position: relative;
       overflow: hidden;
       padding: 27px 25px 24px;
-      border: 1px solid #2d4051;
+      border: 1px solid var(--hero-border);
       border-radius: 28px;
-      background: linear-gradient(135deg, #1b2c3b, #141c25 68%);
+      background: linear-gradient(135deg, var(--hero-start), var(--hero-end) 68%);
     }
     .hero::after {
       position: absolute;
@@ -87,15 +124,15 @@
       right: -44px;
       width: 190px;
       height: 190px;
-      border: 1px solid rgba(130, 202, 255, .16);
+      border: 1px solid rgba(var(--accent-rgb), .16);
       border-radius: 50%;
-      box-shadow: 0 0 0 22px rgba(130, 202, 255, .035), 0 0 0 46px rgba(130, 202, 255, .025);
+      box-shadow: 0 0 0 22px rgba(var(--accent-rgb), .035), 0 0 0 46px rgba(var(--accent-rgb), .025);
       content: "";
       pointer-events: none;
     }
     .eyebrow {
       margin: 0 0 11px;
-      color: #a8d7f6;
+      color: var(--eyebrow);
       font-size: 11px;
       font-weight: 700;
       letter-spacing: .13em;
@@ -173,18 +210,18 @@
       min-width: 0;
       height: 48px;
       padding: 0 13px;
-      border: 1px solid #343a32;
+      border: 1px solid var(--input-border);
       border-radius: 13px;
       box-sizing: border-box;
       outline: none;
-      background: #121511;
+      background: var(--input-bg);
       color: var(--text);
       font-size: 15px;
       transition: border-color .15s, box-shadow .15s;
     }
-    .field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(130, 202, 255, .14); }
+    .field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .14); }
     input[type="date"] {
-      color-scheme: dark;
+      color-scheme: inherit;
       -webkit-appearance: none;
       appearance: none;
       line-height: 46px;
@@ -200,7 +237,7 @@
       border: 0;
       border-radius: 14px;
       background: var(--accent);
-      color: #10202d;
+      color: var(--accent-contrast);
       font-size: 14px;
       font-weight: 760;
       cursor: pointer;
@@ -235,10 +272,10 @@
       gap: 12px;
       min-height: 68px;
       padding: 10px 15px;
-      border-bottom: 1px solid #292d28;
+      border-bottom: 1px solid var(--line);
     }
     .history-row:last-child { border-bottom: 0; }
-    .history-row.goal-row { background: linear-gradient(90deg, rgba(130, 202, 255, .12), transparent 85%); }
+    .history-row.goal-row { background: linear-gradient(90deg, rgba(var(--accent-rgb), .12), transparent 85%); }
     .history-date { font-size: 13px; font-weight: 610; }
     .history-weekday { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 450; }
     .history-steps { white-space: nowrap; font-size: 13px; font-weight: 680; }
@@ -247,7 +284,7 @@
       margin-left: 5px;
       padding: 3px 6px;
       border-radius: 7px;
-      background: var(--accent-dark);
+      background: rgba(var(--accent-rgb), .16);
       color: var(--accent);
       font-size: 9px;
       font-weight: 760;
@@ -266,10 +303,85 @@
       cursor: pointer;
     }
     .icon-button:hover, .icon-button:focus-visible { background: var(--surface-raised); color: var(--text); }
-    .icon-button.delete:hover, .icon-button.delete:focus-visible { color: var(--red); }
+    .icon-button.delete:hover, .icon-button.delete:focus-visible { color: var(--negative); }
     .icon-button svg { width: 16px; height: 16px; }
     .empty-state { padding: 27px 18px; color: var(--muted); font-size: 13px; text-align: center; }
 
+    .appearance-card {
+      margin-top: 22px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+    }
+    .appearance-card h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 680;
+    }
+    .appearance-description {
+      margin: 5px 0 15px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .appearance-controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .appearance-field {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .theme-select, .accent-picker {
+      width: 100%;
+      min-width: 0;
+      height: 46px;
+      border: 1px solid var(--control-border);
+      border-radius: 12px;
+      background: var(--control-bg);
+      color: var(--text);
+    }
+    .theme-select {
+      padding: 0 12px;
+      font-size: 13px;
+    }
+    .accent-picker {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 4px 10px;
+      cursor: pointer;
+    }
+    .accent-picker input {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+    }
+    .accent-picker input::-webkit-color-swatch-wrapper { padding: 0; }
+    .accent-picker input::-webkit-color-swatch { border: 1px solid var(--control-border); border-radius: 7px; }
+    .accent-value {
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .theme-select:focus-visible, .accent-picker:focus-within {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
     .backup-row {
       display: flex;
       align-items: center;
@@ -279,7 +391,7 @@
       padding: 16px 17px;
       border: 1px solid var(--line);
       border-radius: 18px;
-      background: rgba(25, 28, 24, .65);
+      background: var(--backup-bg);
     }
     .backup-copy strong { display: block; font-size: 12px; font-weight: 650; }
     .backup-copy span { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
@@ -287,16 +399,16 @@
     .secondary-button {
       min-height: 36px;
       padding: 0 11px;
-      border: 1px solid #343a32;
+      border: 1px solid var(--control-border);
       border-radius: 10px;
-      background: #20241f;
+      background: var(--control-bg);
       color: var(--text);
       font-size: 10px;
       font-weight: 650;
       white-space: nowrap;
       cursor: pointer;
     }
-    .secondary-button:hover { border-color: #68705f; }
+    .secondary-button:hover { border-color: var(--control-hover); }
     .toast {
       position: fixed;
       z-index: 3;
@@ -307,9 +419,9 @@
       max-width: calc(100% - 36px);
       margin: auto;
       padding: 12px 16px;
-      border: 1px solid #39536a;
+      border: 1px solid var(--toast-border);
       border-radius: 13px;
-      background: #1d2b37;
+      background: var(--toast-bg);
       color: var(--text);
       font-size: 12px;
       box-shadow: 0 12px 35px rgba(0, 0, 0, .35);
@@ -445,6 +557,27 @@
       </div>
     </section>
 
+    <section class="appearance-card" aria-labelledby="appearanceTitle">
+      <h2 id="appearanceTitle">Оформление</h2>
+      <p class="appearance-description">Выберите тему и цвет акцентов интерфейса.</p>
+      <div class="appearance-controls">
+        <label class="appearance-field" for="themeSelect">
+          Тема
+          <select class="theme-select" id="themeSelect">
+            <option value="dark">Тёмная</option>
+            <option value="light">Светлая</option>
+          </select>
+        </label>
+        <div class="appearance-field">
+          <label for="accentPicker">Цвет интерфейса</label>
+          <div class="accent-picker">
+            <input type="color" id="accentPicker" value="#82caff" aria-label="Выбрать цвет интерфейса">
+            <span class="accent-value" id="accentValue">#82CAFF</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="backup-row" aria-label="Резервная копия">
       <div class="backup-copy">
         <strong>Ваши данные на этом устройстве</strong>
@@ -464,12 +597,15 @@
       "use strict";
 
       const STORAGE_KEY = "steps-tracker-records";
+      const APPEARANCE_KEY = "steps-tracker-appearance";
+      const DEFAULT_APPEARANCE = { theme: "dark", accent: "#82caff" };
       const GOAL = 10000;
       const byId = (id) => document.getElementById(id);
       const dateInput = byId("entryDate");
       const stepsInput = byId("entrySteps");
       const form = byId("entryForm");
       let records = loadRecords();
+      let appearance = loadAppearance();
       let editingDate = null;
       let toastTimer;
 
@@ -511,6 +647,23 @@
         }
       }
 
+      function loadAppearance() {
+        try {
+          const stored = localStorage.getItem(APPEARANCE_KEY);
+          if (!stored) return { ...DEFAULT_APPEARANCE };
+          const parsed = JSON.parse(stored);
+          if (!parsed || !["dark", "light"].includes(parsed.theme) ||
+              typeof parsed.accent !== "string" || !/^#[0-9a-f]{6}$/i.test(parsed.accent)) {
+            throw new Error("Сохранённые настройки оформления имеют неверный формат.");
+          }
+          return { theme: parsed.theme, accent: parsed.accent.toLowerCase() };
+        } catch (error) {
+          console.error("Не удалось загрузить настройки оформления:", error);
+          window.setTimeout(() => showToast("Не удалось загрузить настройки оформления. Используются значения по умолчанию."), 0);
+          return { ...DEFAULT_APPEARANCE };
+        }
+      }
+
       function normalizeRecords(items) {
         const byDate = new Map();
         items.forEach((item) => byDate.set(item.date, { date: item.date, steps: item.steps }));
@@ -534,6 +687,63 @@
         toast.classList.add("show");
         window.clearTimeout(toastTimer);
         toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2600);
+      }
+
+      function relativeLuminance(hex) {
+        const channels = hex.slice(1).match(/.{2}/g).map((channel) => parseInt(channel, 16) / 255);
+        const linear = channels.map((channel) => (
+          channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+        ));
+        return linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
+      }
+
+      function contrastRatio(first, second) {
+        const lighter = Math.max(first, second);
+        const darker = Math.min(first, second);
+        return (lighter + 0.05) / (darker + 0.05);
+      }
+
+      function applyAppearance() {
+        const root = document.documentElement;
+        const rgb = appearance.accent.slice(1).match(/.{2}/g).map((channel) => parseInt(channel, 16));
+        const accentLuminance = relativeLuminance(appearance.accent);
+        const darkText = "#10202d";
+        const darkTextLuminance = relativeLuminance(darkText);
+        const contrastText = contrastRatio(accentLuminance, darkTextLuminance) >=
+          contrastRatio(accentLuminance, 1) ? darkText : "#ffffff";
+
+        root.dataset.theme = appearance.theme;
+        root.style.setProperty("--accent", appearance.accent);
+        root.style.setProperty("--accent-rgb", rgb.join(", "));
+        root.style.setProperty("--accent-contrast", contrastText);
+        byId("themeSelect").value = appearance.theme;
+        byId("accentPicker").value = appearance.accent;
+        byId("accentValue").textContent = appearance.accent.toUpperCase();
+
+        const background = getComputedStyle(root).getPropertyValue("--bg").trim();
+        byId("themeColorMeta").content = background;
+        byId("appleStatusMeta").content = appearance.theme === "dark" ? "black-translucent" : "default";
+      }
+
+      function saveAppearance() {
+        try {
+          localStorage.setItem(APPEARANCE_KEY, JSON.stringify(appearance));
+          return true;
+        } catch (error) {
+          console.error("Не удалось сохранить настройки оформления:", error);
+          showToast("Не удалось сохранить настройки оформления.");
+          return false;
+        }
+      }
+
+      function updateAppearance(changes) {
+        const previous = appearance;
+        appearance = { ...appearance, ...changes };
+        applyAppearance();
+        if (!saveAppearance()) {
+          appearance = previous;
+          applyAppearance();
+        }
       }
 
       function formatNumber(value) {
@@ -817,6 +1027,14 @@
         }
       });
 
+      byId("themeSelect").addEventListener("change", (event) => {
+        updateAppearance({ theme: event.currentTarget.value });
+      });
+      byId("accentPicker").addEventListener("input", (event) => {
+        updateAppearance({ accent: event.currentTarget.value.toLowerCase() });
+      });
+
+      applyAppearance();
       byId("todayDate").textContent = displayDate(localDateString(new Date()), { day: "numeric", month: "long" });
       dateInput.value = localDateString(new Date());
       render();

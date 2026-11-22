@@ -391,6 +391,11 @@
           <div class="stat-detail">дней за последние 7</div>
         </article>
         <article class="stat-card">
+          <div class="stat-label">Всего шагов за год</div>
+          <strong class="stat-value compact" id="yearTotal">0</strong>
+          <div class="stat-detail" id="yearDetail"></div>
+        </article>
+        <article class="stat-card">
           <div class="stat-label">К вчерашнему дню</div>
           <strong class="stat-value compact" id="yesterdayDelta">—</strong>
           <div class="stat-detail" id="yesterdayDetail">шагов</div>
@@ -599,6 +604,16 @@
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+        const todayString = localDateString(today);
+        const currentYear = String(today.getFullYear());
+        const yearTotal = records.reduce((total, record) => (
+          record.date.startsWith(`${currentYear}-`) && record.date <= todayString
+            ? total + record.steps
+            : total
+        ), 0);
+        byId("yearTotal").textContent = formatNumber(yearTotal);
+        byId("yearDetail").textContent = `${currentYear} год · с 1 января`;
+
         let goalDays = 0;
         for (let offset = 0; offset < 7; offset += 1) {
           const date = new Date(today);

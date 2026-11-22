@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10120f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Шаги">
+  <meta name="description" content="Ежедневный трекер шагов с аналитикой и резервным копированием.">
+  <title>Шаги — трекер активности</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10120f;
+      --surface: #191c18;
+      --surface-raised: #20241f;
+      --line: #2b302a;
+      --text: #f2f4ef;
+      --muted: #92988f;
+      --green: #c4f36b;
+      --green-dark: #27351b;
+      --red: #ff8f86;
+      --radius: 22px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background:
+        radial-gradient(ellipse at 50% -18%, rgba(196, 243, 107, .09), transparent 42%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; }
+
+    .app {
+      width: min(100% - 36px, 760px);
+      margin: 0 auto;
+      padding: max(26px, env(safe-area-inset-top)) 0 max(36px, env(safe-area-inset-bottom));
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--green);
+      color: #17200d;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+    .brand-name { font-size: 15px; font-weight: 720; letter-spacing: -.02em; }
+    .brand-caption { margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .today-label { color: var(--muted); font-size: 12px; text-align: right; }
+    .today-date { margin-top: 3px; color: var(--text); font-size: 13px; font-weight: 600; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 27px 25px 24px;
+      border: 1px solid #30362c;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #22281d, #191c18 65%);
+    }
+    .hero::after {
+      position: absolute;
+      top: -60px;
+      right: -44px;
+      width: 190px;
+      height: 190px;
+      border: 1px solid rgba(196, 243, 107, .12);
+      border-radius: 50%;
+      box-shadow: 0 0 0 22px rgba(196, 243, 107, .025), 0 0 0 46px rgba(196, 243, 107, .02);
+      content: "";
+      pointer-events: none;
+    }
+    .eyebrow {
+      margin: 0 0 11px;
+      color: #b6c69d;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .hero-title {
+      margin: 0;
+      font-size: clamp(29px, 8vw, 42px);
+      font-weight: 700;
+      letter-spacing: -.055em;
+      line-height: 1.12;
+    }
+    .hero-title span { color: var(--green); }
+    .hero-subtitle { margin: 9px 0 0; color: var(--muted); font-size: 13px; }
+
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 28px 2px 13px;
+    }
+    .section-heading h2 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 680;
+      letter-spacing: -.025em;
+    }
+    .section-note { color: var(--muted); font-size: 11px; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .stat-card {
+      min-height: 111px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 19px;
+      background: var(--surface);
+    }
+    .stat-card.wide { grid-column: 1 / -1; min-height: 102px; }
+    .stat-label { color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .stat-value {
+      display: block;
+      margin-top: 10px;
+      font-size: clamp(20px, 5.2vw, 26px);
+      font-weight: 720;
+      letter-spacing: -.045em;
+      line-height: 1.1;
+    }
+    .stat-value.compact { font-size: 20px; }
+    .stat-detail { margin-top: 6px; color: var(--muted); font-size: 11px; }
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+
+    .entry-card {
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field-label {
+      display: block;
+      margin: 0 0 7px 2px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .field-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 13px;
+      border: 1px solid #343a32;
+      border-radius: 13px;
+      outline: none;
+      background: #121511;
+      color: var(--text);
+      font-size: 15px;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(196, 243, 107, .1); }
+    input[type="date"] { color-scheme: dark; }
+    .save-button {
+      width: 100%;
+      min-height: 49px;
+      margin-top: 13px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--green);
+      color: #17200d;
+      font-size: 14px;
+      font-weight: 760;
+      cursor: pointer;
+      transition: transform .12s, filter .12s;
+    }
+    .save-button:active { transform: scale(.985); }
+    .save-button:hover { filter: brightness(1.04); }
+    .cancel-edit {
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+      padding: 9px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .cancel-edit.visible { display: block; }
+
+    .history-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .history-list { margin: 0; padding: 0; list-style: none; }
+    .history-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 68px;
+      padding: 10px 15px;
+      border-bottom: 1px solid #292d28;
+    }
+    .history-row:last-child { border-bottom: 0; }
+    .history-row.goal-row { background: linear-gradient(90deg, rgba(196, 243, 107, .085), transparent 85%); }
+    .history-date { font-size: 13px; font-weight: 610; }
+    .history-weekday { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 450; }
+    .history-steps { white-space: nowrap; font-size: 13px; font-weight: 680; }
+    .goal-badge {
+      display: inline-block;
+      margin-left: 5px;
+      padding: 3px 6px;
+      border-radius: 7px;
+      background: var(--green-dark);
+      color: var(--green);
+      font-size: 9px;
+      font-weight: 760;
+      vertical-align: 1px;
+    }
+    .row-actions { display: flex; gap: 4px; }
+    .icon-button {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .icon-button:hover, .icon-button:focus-visible { background: var(--surface-raised); color: var(--text); }
+    .icon-button.delete:hover, .icon-button.delete:focus-visible { color: var(--red); }
+    .icon-button svg { width: 16px; height: 16px; }
+    .empty-state { padding: 27px 18px; color: var(--muted); font-size: 13px; text-align: center; }
+
+    .backup-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 22px;
+      padding: 16px 17px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(25, 28, 24, .65);
+    }
+    .backup-copy strong { display: block; font-size: 12px; font-weight: 650; }
+    .backup-copy span { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .backup-actions { display: flex; gap: 7px; }
+    .secondary-button {
+      min-height: 36px;
+      padding: 0 11px;
+      border: 1px solid #343a32;
+      border-radius: 10px;
+      background: #20241f;
+      color: var(--text);
+      font-size: 10px;
+      font-weight: 650;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .secondary-button:hover { border-color: #68705f; }
+    .toast {
+      position: fixed;
+      z-index: 3;
+      right: 18px;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      left: 18px;
+      width: fit-content;
+      max-width: calc(100% - 36px);
+      margin: auto;
+      padding: 12px 16px;
+      border: 1px solid #414a37;
+      border-radius: 13px;
+      background: #252b20;
+      color: var(--text);
+      font-size: 12px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, .35);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity .2s, transform .2s;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (min-width: 650px) {
+      .app { padding-top: max(38px, env(safe-area-inset-top)); }
+      .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .stat-card.wide { grid-column: auto; min-height: 111px; }
+      .stat-card:nth-child(4), .stat-card:nth-child(5) { grid-column: span 1; }
+      .history-row { padding-right: 20px; padding-left: 20px; }
+    }
+    @media (max-width: 390px) {
+      .app { width: min(100% - 28px, 760px); }
+      .hero { padding: 23px 20px; }
+      .backup-row { align-items: flex-start; flex-direction: column; }
+      .backup-actions { width: 100%; }
+      .secondary-button { flex: 1; }
+      .history-row { gap: 8px; padding-right: 10px; padding-left: 12px; }
+      .icon-button { width: 31px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8.2 4.2c1.7-.5 3.2.7 3.4 2.4l.2 2c.2 1.5-.6 2.8-2 3.3l-1.6.6c-1.5.6-2.6 2.1-2.7 3.8l-.1 2.4"/>
+            <path d="M16.2 7.2c1.4.3 2.2 1.6 2 3l-.2 1.2c-.2 1.2.4 2.5 1.5 3.1"/>
+            <path d="m8 7 3-1M7.4 14.5l4-1.4"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">Шаги</div>
+          <div class="brand-caption">ваш дневник активности</div>
+        </div>
+      </div>
+      <div class="today-label">Сегодня<div class="today-date" id="todayDate"></div></div>
+    </header>
+
+    <section class="hero" aria-labelledby="heroTitle">
+      <p class="eyebrow">Каждый шаг имеет значение</p>
+      <h1 class="hero-title" id="heroTitle">Двигайтесь<br><span>в своём ритме.</span></h1>
+      <p class="hero-subtitle">Маленький прогресс — тоже прогресс.</p>
+    </section>
+
+    <section aria-labelledby="summaryTitle">
+      <div class="section-heading">
+        <h2 id="summaryTitle">Ваша активность</h2>
+        <span class="section-note">обновляется автоматически</span>
+      </div>
+      <div class="stats-grid">
+        <article class="stat-card">
+          <div class="stat-label">Среднее за 7 дней</div>
+          <strong class="stat-value" id="avg7">—</strong>
+          <div class="stat-detail">шагов в день</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">Цель 10 000+</div>
+          <strong class="stat-value" id="goalCount">—</strong>
+          <div class="stat-detail">дней за последние 7</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">К вчерашнему дню</div>
+          <strong class="stat-value compact" id="yesterdayDelta">—</strong>
+          <div class="stat-detail" id="yesterdayDetail">шагов</div>
+        </article>
+        <article class="stat-card wide">
+          <div class="stat-label">К предыдущей неделе</div>
+          <strong class="stat-value compact" id="weekDelta">—</strong>
+          <div class="stat-detail" id="weekDetail">среднее за 7 дней</div>
+        </article>
+        <article class="stat-card wide">
+          <div class="stat-label">К предыдущим 30 дням</div>
+          <strong class="stat-value compact" id="monthDelta">—</strong>
+          <div class="stat-detail" id="monthDetail">среднее за 30 дней</div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="entryTitle">
+      <div class="section-heading">
+        <h2 id="entryTitle">Добавить результат</h2>
+        <span class="section-note">одна запись на день</span>
+      </div>
+      <form class="entry-card" id="entryForm" novalidate>
+        <div class="form-grid">
+          <div>
+            <label class="field-label" for="entryDate">Дата</label>
+            <input class="field-input" type="date" id="entryDate" required>
+          </div>
+          <div>
+            <label class="field-label" for="entrySteps">Количество шагов</label>
+            <input class="field-input" type="number" id="entrySteps" inputmode="numeric" min="1" step="1" placeholder="Например, 8 500" required>
+          </div>
+        </div>
+        <button class="save-button" type="submit" id="saveButton">Сохранить результат</button>
+        <button class="cancel-edit" type="button" id="cancelEdit">Отменить редактирование</button>
+      </form>
+    </section>
+
+    <section aria-labelledby="historyTitle">
+      <div class="section-heading">
+        <h2 id="historyTitle">История</h2>
+        <span class="section-note" id="historyCount"></span>
+      </div>
+      <div class="history-card">
+        <ul class="history-list" id="historyList" aria-live="polite"></ul>
+        <div class="empty-state" id="emptyState">Записей пока нет. Добавьте первые шаги за сегодня.</div>
+      </div>
+    </section>
+
+    <section class="backup-row" aria-label="Резервная копия">
+      <div class="backup-copy">
+        <strong>Ваши данные на этом устройстве</strong>
+        <span>Сохраните копию или восстановите её из файла</span>
+      </div>
+      <div class="backup-actions">
+        <button class="secondary-button" type="button" id="exportButton">Экспорт JSON</button>
+        <button class="secondary-button" type="button" id="importButton">Импорт</button>
+        <input class="sr-only" type="file" id="importFile" accept=".json,application/json">
+      </div>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "steps-tracker-records";
+      const GOAL = 10000;
+      const byId = (id) => document.getElementById(id);
+      const dateInput = byId("entryDate");
+      const stepsInput = byId("entrySteps");
+      const form = byId("entryForm");
+      let records = loadRecords();
+      let editingDate = null;
+      let toastTimer;
+
+      function localDateString(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function parseDate(value) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+        const [year, month, day] = value.split("-").map(Number);
+        const date = new Date(year, month - 1, day);
+        return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
+          ? date
+          : null;
+      }
+
+      function validRecord(record) {
+        return record && typeof record === "object" &&
+          typeof record.date === "string" && parseDate(record.date) !== null &&
+          Number.isSafeInteger(record.steps) && record.steps > 0;
+      }
+
+      function loadRecords() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (!stored) return [];
+          const parsed = JSON.parse(stored);
+          if (!Array.isArray(parsed) || !parsed.every(validRecord)) {
+            throw new Error("Сохранённые данные имеют неверный формат.");
+          }
+          return normalizeRecords(parsed);
+        } catch (error) {
+          console.error("Не удалось загрузить записи шагов:", error);
+          window.setTimeout(() => showToast("Не удалось прочитать данные. Проверьте хранилище браузера."), 0);
+          return [];
+        }
+      }
+
+      function normalizeRecords(items) {
+        const byDate = new Map();
+        items.forEach((item) => byDate.set(item.date, { date: item.date, steps: item.steps }));
+        return Array.from(byDate.values()).sort((a, b) => b.date.localeCompare(a.date));
+      }
+
+      function saveRecords() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+          return true;
+        } catch (error) {
+          console.error("Не удалось сохранить записи шагов:", error);
+          showToast("Не удалось сохранить данные. Возможно, хранилище браузера заполнено.");
+          return false;
+        }
+      }
+
+      function showToast(message) {
+        const toast = byId("toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2600);
+      }
+
+      function formatNumber(value) {
+        return new Intl.NumberFormat("ru-RU").format(value);
+      }
+
+      function displayDate(dateString, options) {
+        const date = parseDate(dateString);
+        return date.toLocaleDateString("ru-RU", options);
+      }
+
+      function recordFor(dateString) {
+        return records.find((record) => record.date === dateString);
+      }
+
+      function rangeAverage(endOffset, length) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        let total = 0;
+        for (let offset = endOffset; offset < endOffset + length; offset += 1) {
+          const date = new Date(today);
+          date.setDate(today.getDate() - offset);
+          const record = recordFor(localDateString(date));
+          if (record) total += record.steps;
+        }
+        return total / length;
+      }
+
+      function deltaText(current, previous) {
+        const difference = current - previous;
+        const rounded = Math.round(difference);
+        const sign = rounded > 0 ? "+" : rounded < 0 ? "−" : "";
+        const amount = `${sign}${formatNumber(Math.abs(rounded))}`;
+        if (previous === 0) {
+          return { value: amount, detail: current === 0 ? "без изменений" : "нет данных для сравнения", className: current > 0 ? "positive" : "" };
+        }
+        const percent = Math.round((difference / previous) * 100);
+        const percentSign = percent > 0 ? "+" : percent < 0 ? "−" : "";
+        return {
+          value: `${amount} (${percentSign}${Math.abs(percent)}%)`,
+          detail: "шагов в среднем за день",
+          className: difference > 0 ? "positive" : difference < 0 ? "negative" : ""
+        };
+      }
+
+      function updateComparison(valueId, detailId, current, previous) {
+        const result = deltaText(current, previous);
+        const value = byId(valueId);
+        value.textContent = result.value;
+        value.classList.remove("positive", "negative");
+        if (result.className) value.classList.add(result.className);
+        byId(detailId).textContent = result.detail;
+      }
+
+      function renderSummary() {
+        const avg = rangeAverage(0, 7);
+        byId("avg7").textContent = formatNumber(Math.round(avg));
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        let goalDays = 0;
+        for (let offset = 0; offset < 7; offset += 1) {
+          const date = new Date(today);
+          date.setDate(today.getDate() - offset);
+          const record = recordFor(localDateString(date));
+          if (record && record.steps >= GOAL) goalDays += 1;
+        }
+        byId("goalCount").textContent = `${goalDays} / 7`;
+
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const yesterdayRecord = recordFor(localDateString(yesterday));
+        const todayRecord = recordFor(localDateString(today));
+        const yesterdayValue = byId("yesterdayDelta");
+        yesterdayValue.classList.remove("positive", "negative");
+        if (!yesterdayRecord || !todayRecord) {
+          yesterdayValue.textContent = "—";
+          byId("yesterdayDetail").textContent = "нужны данные за оба дня";
+        } else {
+          const difference = todayRecord.steps - yesterdayRecord.steps;
+          const percent = yesterdayRecord.steps === 0 ? null : Math.round((difference / yesterdayRecord.steps) * 100);
+          const sign = difference > 0 ? "+" : difference < 0 ? "−" : "";
+          const percentText = percent === null ? "" : ` (${percent > 0 ? "+" : percent < 0 ? "−" : ""}${Math.abs(percent)}%)`;
+          yesterdayValue.textContent = `${sign}${formatNumber(Math.abs(difference))}${percentText}`;
+          if (difference > 0) yesterdayValue.classList.add("positive");
+          if (difference < 0) yesterdayValue.classList.add("negative");
+          byId("yesterdayDetail").textContent = "шагов к вчерашнему дню";
+        }
+
+        updateComparison("weekDelta", "weekDetail", rangeAverage(0, 7), rangeAverage(7, 7));
+        updateComparison("monthDelta", "monthDetail", rangeAverage(0, 30), rangeAverage(30, 30));
+      }
+
+      function icon(name) {
+        if (name === "edit") {
+          return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>';
+        }
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/></svg>';
+      }
+
+      function renderHistory() {
+        const list = byId("historyList");
+        list.replaceChildren();
+        byId("emptyState").hidden = records.length > 0;
+        byId("historyCount").textContent = `${records.length} ${plural(records.length, ["запись", "записи", "записей"])}`;
+
+        records.forEach((record) => {
+          const item = document.createElement("li");
+          item.className = `history-row${record.steps >= GOAL ? " goal-row" : ""}`;
+
+          const date = document.createElement("div");
+          date.className = "history-date";
+          date.append(document.createTextNode(displayDate(record.date, { day: "numeric", month: "long" })));
+          const weekday = document.createElement("span");
+          weekday.className = "history-weekday";
+          weekday.textContent = displayDate(record.date, { weekday: "long", year: "numeric" });
+          date.append(weekday);
+
+          const steps = document.createElement("div");
+          steps.className = "history-steps";
+          steps.append(document.createTextNode(`${formatNumber(record.steps)} шагов`));
+          if (record.steps >= GOAL) {
+            const badge = document.createElement("span");
+            badge.className = "goal-badge";
+            badge.textContent = "ЦЕЛЬ";
+            steps.append(badge);
+          }
+
+          const actions = document.createElement("div");
+          actions.className = "row-actions";
+          const editButton = document.createElement("button");
+          editButton.className = "icon-button";
+          editButton.type = "button";
+          editButton.setAttribute("aria-label", `Редактировать запись за ${displayDate(record.date, { day: "numeric", month: "long" })}`);
+          editButton.innerHTML = icon("edit");
+          editButton.addEventListener("click", () => beginEdit(record));
+          const deleteButton = document.createElement("button");
+          deleteButton.className = "icon-button delete";
+          deleteButton.type = "button";
+          deleteButton.setAttribute("aria-label", `Удалить запись за ${displayDate(record.date, { day: "numeric", month: "long" })}`);
+          deleteButton.innerHTML = icon("delete");
+          deleteButton.addEventListener("click", () => deleteRecord(record.date));
+          actions.append(editButton, deleteButton);
+          item.append(date, steps, actions);
+          list.append(item);
+        });
+      }
+
+      function plural(number, forms) {
+        const n = Math.abs(number) % 100;
+        const last = n % 10;
+        if (n > 10 && n < 20) return forms[2];
+        if (last > 1 && last < 5) return forms[1];
+        if (last === 1) return forms[0];
+        return forms[2];
+      }
+
+      function render() {
+        renderSummary();
+        renderHistory();
+      }
+
+      function beginEdit(record) {
+        editingDate = record.date;
+        dateInput.value = record.date;
+        stepsInput.value = String(record.steps);
+        byId("entryTitle").textContent = "Редактировать результат";
+        byId("saveButton").textContent = "Обновить результат";
+        byId("cancelEdit").classList.add("visible");
+        byId("entryForm").scrollIntoView({ behavior: "smooth", block: "center" });
+        stepsInput.focus({ preventScroll: true });
+      }
+
+      function resetEdit() {
+        editingDate = null;
+        form.reset();
+        dateInput.value = localDateString(new Date());
+        byId("entryTitle").textContent = "Добавить результат";
+        byId("saveButton").textContent = "Сохранить результат";
+        byId("cancelEdit").classList.remove("visible");
+      }
+
+      function deleteRecord(date) {
+        const label = displayDate(date, { day: "numeric", month: "long", year: "numeric" });
+        if (!window.confirm(`Удалить запись за ${label}?`)) return;
+        const previous = records;
+        records = records.filter((record) => record.date !== date);
+        if (!saveRecords()) {
+          records = previous;
+          return;
+        }
+        if (editingDate === date) resetEdit();
+        render();
+        showToast("Запись удалена");
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const date = dateInput.value;
+        const stepsText = stepsInput.value.trim();
+        if (!parseDate(date)) {
+          showToast("Выберите корректную дату.");
+          dateInput.focus();
+          return;
+        }
+        if (!/^[1-9]\d*$/.test(stepsText) || !Number.isSafeInteger(Number(stepsText))) {
+          showToast("Введите положительное целое число шагов.");
+          stepsInput.focus();
+          return;
+        }
+        const steps = Number(stepsText);
+        const previous = records;
+        records = normalizeRecords([...records.filter((record) => record.date !== date), { date, steps }]);
+        if (!saveRecords()) {
+          records = previous;
+          return;
+        }
+        resetEdit();
+        render();
+        showToast("Результат сохранён");
+      });
+
+      byId("cancelEdit").addEventListener("click", resetEdit);
+
+      byId("exportButton").addEventListener("click", () => {
+        const data = new Blob([`${JSON.stringify(records, null, 2)}\n`], { type: "application/json" });
+        const url = URL.createObjectURL(data);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `shagi-backup-${localDateString(new Date())}.json`;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        showToast("Резервная копия скачана");
+      });
+
+      byId("importButton").addEventListener("click", () => byId("importFile").click());
+      byId("importFile").addEventListener("change", async (event) => {
+        const file = event.target.files && event.target.files[0];
+        event.target.value = "";
+        if (!file) return;
+        try {
+          const parsed = JSON.parse(await file.text());
+          if (!Array.isArray(parsed) || !parsed.every(validRecord)) {
+            throw new Error("Ожидается JSON-массив записей с корректными датами и положительным целым числом шагов.");
+          }
+          if (!window.confirm(`Импортировать ${parsed.length} ${plural(parsed.length, ["запись", "записи", "записей"])}? Текущие данные будут заменены.`)) return;
+          const previous = records;
+          records = normalizeRecords(parsed);
+          if (!saveRecords()) {
+            records = previous;
+            return;
+          }
+          resetEdit();
+          render();
+          showToast("Данные успешно импортированы");
+        } catch (error) {
+          console.error("Не удалось импортировать резервную копию:", error);
+          showToast(error instanceof SyntaxError ? "Файл не является корректным JSON." : error.message || "Не удалось прочитать файл.");
+        }
+      });
+
+      byId("todayDate").textContent = displayDate(localDateString(new Date()), { day: "numeric", month: "long" });
+      dateInput.value = localDateString(new Date());
+      render();
+    })();
+  </script>
+</body>
+</html>
